@@ -4,3 +4,12 @@
 *.props
 *.editorconfig
 *.cs
+.vs/MultiSync/FileContentIndex/020b8337-e337-4cfb-b1ee-408d9fdc7370.vsidx
+obj/Debug/net6.0/MultiSync.AssemblyInfo.cs
+obj/Debug/net6.0/MultiSync.assets.cache
+obj/Debug/net6.0/MultiSync.csproj.AssemblyReference.cache
+obj/Debug/net6.0/MultiSync.GeneratedMSBuildEditorConfig.editorconfig
+obj/MultiSync.csproj.nuget.dgspec.json
+obj/MultiSync.csproj.nuget.g.props
+obj/project.assets.json
+obj/project.nuget.cache
