@@ -7,6 +7,7 @@ using MultiSync.Models.Item;
 using MultiSync.Repository.MongoDB;
 using MultiSync.Repository.MS;
 using MultiSync.Repository.XML;
+using MultiSync.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,12 +34,11 @@ builder.Services.AddSingleton<IMongoClient>(sp => new MongoClient(connectionMong
 builder.Services.AddSingleton<IMongoDatabase>(sp => sp.GetRequiredService<IMongoClient>().GetDatabase(dataMongoDB));
 builder.Services.AddScoped<IMongoDBRepo<BsonItem>, MongoDBRepo>();
 
+builder.Services.AddSingleton<EventManager>();
+builder.Services.AddScoped<EventHandlerService>();
 
 // XML Configuration
-builder.Services.AddSingleton<IXMLRepo<XMLItem>>(provider =>
-{
-    return new XMLRepo("Items.xml");
-});
+builder.Services.AddSingleton<IXMLRepo<XMLItem>, XMLRepo>();
 
 //Map all att once
 builder.Services.AddAutoMapper(typeof(AppMapping));

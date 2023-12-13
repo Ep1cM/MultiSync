@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MultiSync.Data;
 using MultiSync.Models.Item;
+using MultiSync.Services;
+using SharpCompress.Common;
 
 namespace MultiSync.Repository.MS
 {
@@ -11,7 +13,7 @@ namespace MultiSync.Repository.MS
 
         public MSRepo(ApplicationContext context)
         {
-            this._context = context;
+            _context = context;
             _entities = context.Set<MSItem>();
         }
 
@@ -20,7 +22,7 @@ namespace MultiSync.Repository.MS
             return _entities.ToList();
         }
 
-        public virtual MSItem GetById(int id)
+        public virtual MSItem GetById(String id)
         {
             return _entities.Find(id);
         }
@@ -31,7 +33,6 @@ namespace MultiSync.Repository.MS
             {
                 throw new ArgumentNullException(nameof(entity));
             }
-
             _entities.Add(entity);
             SaveChanges();
         }
@@ -57,13 +58,25 @@ namespace MultiSync.Repository.MS
             SaveChanges();
         }
 
-        public virtual void Delete(MSItem entity)
+        public virtual void Synced(string itemID)
         {
+            var entity = GetById(itemID);
             if (entity == null)
             {
                 throw new ArgumentNullException(nameof(entity));
             }
+            entity.sync = true;
+            _entities.Update(entity);
+            SaveChanges();
+        }
 
+        public virtual void Delete(String entityID)
+        {
+            if (entityID == null)
+            {
+                throw new ArgumentNullException(nameof(entityID));
+            }
+            var entity = _entities.Find(entityID);
             _entities.Remove(entity);
             SaveChanges();
         }

@@ -6,6 +6,7 @@
         Task<IEnumerable<BsonItem>> GetAllAsync();
         Task<BsonItem> CreateAsync(BsonItem item);
         Task UpdateAsync(string id, BsonItem item);
+        Task SyncedAsync(string itemID);
         Task DeleteAsync(string id);
     }
 }

@@ -1,4 +1,6 @@
 ﻿using MultiSync.Models.Item;
+using MultiSync.Services;
+using SharpCompress.Common;
 using System.Xml.Linq;
 
 namespace MultiSync.Repository.XML
@@ -8,9 +10,9 @@ namespace MultiSync.Repository.XML
         private readonly string _xmlFilePath;
         private readonly XDocument _xmlDocument;
 
-        public XMLRepo(string xmlFilePath)
+        public XMLRepo()
         {
-            _xmlFilePath = xmlFilePath;
+            _xmlFilePath = "Items.xml";
             _xmlDocument = LoadXmlData();
         }
 
@@ -72,6 +74,19 @@ namespace MultiSync.Repository.XML
             }
         }
 
+        public void Synced(String itemID)
+        {
+            XElement existingElement = _xmlDocument.Root.Elements()
+                .FirstOrDefault(x => x.Attribute("surrogateId").Value == itemID);
+            var updItem = Deserialize(existingElement);
+            updItem.sync = true;
+
+            if (existingElement != null)
+            {
+                existingElement.ReplaceWith(Serialize(updItem));
+                SaveChanges();
+            }
+        }
         private void SaveChanges()
         {
             _xmlDocument.Save(_xmlFilePath);
@@ -90,6 +105,7 @@ namespace MultiSync.Repository.XML
                 new XElement("description", item.description),
                 new XElement("quantity", item.quantity),
                 new XElement("price", item.price),
+                new XElement("sync", item.sync),
                 new XElement("createTime", item.createTime.ToString("yyyy-MM-dd HH:mm:ss")),
                 new XElement("changeTime", item.changeTime.ToString("yyyy-MM-dd HH:mm:ss"))
             );
@@ -111,6 +127,7 @@ namespace MultiSync.Repository.XML
                 description = element.Element("description")?.Value,
                 quantity = int.Parse(element.Element("quantity")?.Value),
                 price = double.Parse(element.Element("price")?.Value),
+                sync = bool.Parse(element.Element("sync")?.Value),
                 createTime = DateTime.Parse(element.Element("createTime")?.Value),
                 changeTime = DateTime.Parse(element.Element("changeTime")?.Value)
             };

@@ -1,5 +1,6 @@
 ﻿using MongoDB.Driver;
 using MultiSync.Models.Item;
+using MultiSync.Services;
 
 namespace MultiSync.Repository.MongoDB
 {
@@ -33,8 +34,15 @@ namespace MultiSync.Repository.MongoDB
             await _items.ReplaceOneAsync(u => u.surrogateId == id, item);
         }
 
+        public async Task SyncedAsync(string itemID)
+        {
+            var item = await GetByIdAsync(itemID);
+            item.sync = true;
+            await _items.ReplaceOneAsync(u => u.surrogateId == itemID, item);
+        }
         public async Task DeleteAsync(string id)
         {
+            var item = await GetByIdAsync(id);
             await _items.DeleteOneAsync(item => item.surrogateId == id);
         }
     }
