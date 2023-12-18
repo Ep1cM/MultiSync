@@ -4,27 +4,26 @@ using MultiSync.Models.Item;
 using MultiSync.Repository.MongoDB;
 using MultiSync.Repository.MS;
 using MultiSync.Repository.XML;
+using MultiSync.Services;
 
 namespace MultiSync.Controllers
 {
     public class SyncController : Controller
     {
+        private readonly EventHandlerService _eventSubscriber;
         private readonly IMSRepo<MSItem> _msRepo;
         private readonly IMongoDBRepo<BsonItem> _mongoRepo;
         private readonly IXMLRepo<XMLItem> _xmlRepo;
         private IMapper _mapper;
-        public SyncController(IMSRepo<MSItem> mSRepo, IMongoDBRepo<BsonItem> mongoRepo, IXMLRepo<XMLItem> xmlRepo, IMapper mapper)
+        public SyncController( IMapper mapper)
         {
-            _msRepo = mSRepo;
-            _mongoRepo = mongoRepo;
-            _xmlRepo = xmlRepo;
             _mapper = mapper;
         }
         public IActionResult Index()
         {
             return View();
         }
-
+        /*
         [HttpGet]
         [Route("/SyncController/Check")]
         public bool CheckDifferences()
@@ -38,7 +37,15 @@ namespace MultiSync.Controllers
             }
             return CheckDeletes();
         }
+        
+        public List listOfNewItems()
+        {
+            var ms = _msRepo.GetAll().Where(x => x.sync = false).Select(ms => ms.surrogateId);
+            var mongo = _mongoRepo.GetAllAsync().Result.Where(x => x.sync = false).Select(mg => mg.surrogateId);
+            var xml = _xmlRepo.GetAll().Where(x => x.sync = false).Select(x => x.surrogateId);
+        }*/
 
+        /*
         public bool CheckDeletes()
         {
             var ms = _msRepo.GetAll().Where(x => x.sync = true).Select(ms => ms.surrogateId);
@@ -59,6 +66,6 @@ namespace MultiSync.Controllers
                 return true;
             }
             return false;
-        }
+        }*/
     }
 }

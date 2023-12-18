@@ -5,15 +5,20 @@ using MultiSync.Models.Item;
 using MultiSync.Repository.MongoDB;
 using MultiSync.Repository.MS;
 using MultiSync.Repository.XML;
+using MultiSync.Services;
 
 namespace MultiSync.Controllers
 {
     public class XMLController : Controller
     {
+        private readonly EventManager _eventManager;
+        private readonly EventHandlerService _eventSubscriber;
         private readonly IXMLRepo<XMLItem> _xmlRepo;
         private IMapper _mapper;
-        public XMLController(IXMLRepo<XMLItem> xmlRepo, IMapper mapper)
+        public XMLController(EventManager eventManager,EventHandlerService eventSubscriber, IXMLRepo<XMLItem> xmlRepo, IMapper mapper)
         {
+            _eventManager = eventManager;
+            _eventSubscriber = eventSubscriber;
             _xmlRepo = xmlRepo;
             _mapper = mapper;
         }
@@ -50,7 +55,9 @@ namespace MultiSync.Controllers
             var addItem = new ItemViewModel(data.Name, data.Description, data.Quantity, data.Price);
             try
             {
-                _xmlRepo.Add(_mapper.Map<XMLItem>(addItem));
+                var item = _mapper.Map<XMLItem>(addItem);
+                _xmlRepo.Add(item);
+                _eventManager.Publish(new XMLItemEventArgs(item,"Create"));
             }
             catch (Exception ex)
             {

@@ -2,24 +2,31 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Driver.Core.Events;
 using MultiSync.Models.Item;
 using MultiSync.Repository.MS;
 using MultiSync.Repository.XML;
+using MultiSync.Services;
 using Newtonsoft.Json.Linq;
 
 namespace MultiSync.Controllers
 {
     public class MSController : Controller
     {
+        private readonly EventManager _eventManager;
+        private readonly EventHandlerService _eventSubscriber;
         private readonly IMSRepo<MSItem> _msRepo;
         private IMapper _mapper;
-        public MSController(IMSRepo<MSItem> mSRepo, IMapper mapper) {
+        public MSController(EventManager eventManager,EventHandlerService eventSubscriber,IMSRepo<MSItem> mSRepo, IMapper mapper) 
+        {
+            _eventManager = eventManager;
+            _eventSubscriber = eventSubscriber;
             _msRepo = mSRepo;
             _mapper = mapper;
         }
 
         // GET: MSController
-        //[Authorize]
+        [Authorize]
         public ActionResult Index()
         {
             var list =  _mapper.Map<List<ItemViewModel>>(_msRepo.GetAll().ToList());
@@ -53,7 +60,9 @@ namespace MultiSync.Controllers
             var addItem = new ItemViewModel(data.Name, data.Description, data.Quantity, data.Price);
             try
             {
-                _msRepo.Add(_mapper.Map<MSItem>(addItem));
+                var item = _mapper.Map<MSItem>(addItem);
+                _msRepo.Add(item);
+                _eventManager.Publish(new MSItemEventArgs(item,"Create"));
             }
             catch (Exception ex)
             {

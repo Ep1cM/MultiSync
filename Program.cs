@@ -26,7 +26,6 @@ string? connection = builder.Configuration.GetConnectionString("MSConnection");
 builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connection));
 builder.Services.AddScoped<IMSRepo<MSItem>, MSRepo>();
 
-
 // MongoDB configuration
 string? connectionMongoDB = builder.Configuration.GetConnectionString("MongoDBConnection");
 string? dataMongoDB = builder.Configuration.GetConnectionString("MongoDBDatabaseName");

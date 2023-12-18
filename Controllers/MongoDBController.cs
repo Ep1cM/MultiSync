@@ -5,15 +5,20 @@ using MultiSync.Models.Item;
 using MultiSync.Repository.MongoDB;
 using MultiSync.Repository.MS;
 using MultiSync.Repository.XML;
+using MultiSync.Services;
 
 namespace MultiSync.Controllers
 {
     public class MongoDBController : Controller
     {
+        private readonly EventManager _eventManager;
+        private readonly EventHandlerService _eventSubscriber;
         private readonly IMongoDBRepo<BsonItem> _mongoRepo;
         private IMapper _mapper;
-        public MongoDBController(IMongoDBRepo<BsonItem> mongoRepo,  IMapper mapper)
+        public MongoDBController(EventManager eventManager, EventHandlerService eventSubscriber,IMongoDBRepo<BsonItem> mongoRepo,  IMapper mapper)
         {
+            _eventManager = eventManager;
+            _eventSubscriber = eventSubscriber;
             _mongoRepo = mongoRepo;
             _mapper = mapper;
         }
@@ -50,7 +55,9 @@ namespace MultiSync.Controllers
             var addItem = new ItemViewModel(data.Name, data.Description, data.Quantity, data.Price);
             try
             {
-                _mongoRepo.CreateAsync(_mapper.Map<BsonItem>(addItem));
+                var ITEM = _mapper.Map<BsonItem>(addItem);
+                _mongoRepo.CreateAsync(ITEM);
+                _eventManager.Publish(new BsonItemEventArgs(ITEM, "Create"));
             }
             catch (Exception ex)
             {

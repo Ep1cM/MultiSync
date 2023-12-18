@@ -22,7 +22,6 @@ namespace MultiSync.Services
             _mongoRepo = mongoRepo;
             _xmlRepo = xmlRepo;
             _mapper = mapper;
-            // Subscribe to events
             _eventManager.Subscribe<MSItemEventArgs>(this, HandleMSItemEvent);
             _eventManager.Subscribe<BsonItemEventArgs>(this, HandleBsonItemEvent);
             _eventManager.Subscribe<XMLItemEventArgs>(this, HandleXMLItemEvent);
@@ -228,7 +227,7 @@ namespace MultiSync.Services
         }
         private void HandleXMLItemEvent(XMLItemEventArgs e)
         {
-            Console.WriteLine("HandleBsonItemEvent");
+            Console.WriteLine("HandleXMLItemEvent");
             var actionCall = e.Action;
             if (actionCall == "Create")
             {
